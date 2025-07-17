@@ -1,6 +1,6 @@
-import { useUser } from '@/hooks/useUser';
+import { userService } from '@/services/userService';
 import axios from 'axios';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
   user: any | null;
@@ -14,21 +14,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token') || null);
-  const { user } = useUser();
-  // useEffect(() => {
-  //   if (token) {
-  //     async function getUser() {
-  //       try {
-  //         const response = await userService.getUser();
+  const [user, setUser] = useState<any | null>(null);
 
-  //         setUser(response);
-  //       } catch (error) {
-  //         console.error('Error fetching user:', error);
-  //       }
-  //     }
-  //     getUser();
-  //   }
-  // }, [token]);
+  useEffect(() => {
+    if (token) {
+      async function getUser() {
+        try {
+          const user = await userService.getUser();
+          console.log('user', user);
+          setUser(user);
+        } catch (error) {
+          console.error('Error fetching user:', error);
+        }
+      }
+      getUser();
+    }
+  }, [token]);
 
   const login = async (email: string, password: string) => {
     try {

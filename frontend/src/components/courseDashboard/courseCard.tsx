@@ -45,14 +45,14 @@ export function CourseCard({ course }: CourseCardProps) {
           actualProgress
         )} bg-gradient-to-br from-white to-slate-50`}
       >
-        <CardHeader onClick={() => setShowDetailModal(true)} className="pb-3">
+        <CardHeader onClick={() => setShowDetailModal(true)} className="pb-3 px-4 sm:px-6">
           <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-lg flex items-center gap-2 text-slate-800">
-                <BookOpen className="h-5 w-5 text-teal-600" />
-                {course.title}
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-slate-800 pr-2">
+                <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-teal-600 flex-shrink-0" />
+                <span className="truncate">{course.title}</span>
                 {course.embedded && (
-                  <Badge variant="outline" className="text-xs bg-teal-50 text-teal-700 border-teal-300 shadow-sm">
+                  <Badge variant="outline" className="text-xs bg-teal-50 text-teal-700 border-teal-300 shadow-sm flex-shrink-0 hidden sm:inline-flex">
                     ✨ Embedded
                   </Badge>
                 )}
@@ -67,11 +67,16 @@ export function CourseCard({ course }: CourseCardProps) {
                   <span className="text-teal-600 font-medium">In Progress</span>
                 )}
               </CardDescription>
+              {course.embedded && (
+                <Badge variant="outline" className="text-xs bg-teal-50 text-teal-700 border-teal-300 shadow-sm mt-2 sm:hidden">
+                  ✨ Embedded
+                </Badge>
+              )}
             </div>
-            {course.status === 'completed' && <Award className="h-6 w-6 text-amber-500" />}
+            {course.status === 'completed' && <Award className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500 flex-shrink-0" />}
           </div>
         </CardHeader>
-        <CardContent className="space-y-4" onClick={() => setShowDetailModal(true)}>
+        <CardContent className="space-y-4 px-4 sm:px-6" onClick={() => setShowDetailModal(true)}>
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="font-medium text-slate-700">Progress</span>
@@ -114,8 +119,8 @@ export function CourseCard({ course }: CourseCardProps) {
 
           {course.completionDate && (
             <div className="flex items-center text-sm text-emerald-600 bg-emerald-50 p-2 rounded-lg">
-              <Calendar className="h-4 w-4 mr-2" />
-              🎉 Completed on {new Date(course.completionDate).toLocaleDateString()}
+              <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">🎉 Completed on {new Date(course.completionDate).toLocaleDateString()}</span>
             </div>
           )}
 
@@ -125,7 +130,7 @@ export function CourseCard({ course }: CourseCardProps) {
                 e.stopPropagation();
                 setShowEmbedModal(true);
               }}
-              className={`w-full transition-all duration-300 ${
+              className={`w-full transition-all duration-300 text-sm sm:text-base ${
                 course.embedded
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg'
                   : 'bg-gradient-to-r from-teal-500 to-slate-600 hover:from-teal-600 hover:to-slate-700 text-white shadow-lg hover:shadow-xl'

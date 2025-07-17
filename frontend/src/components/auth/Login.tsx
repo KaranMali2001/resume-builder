@@ -6,13 +6,14 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
-const navigate= useNavigate()
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   const res= await login(email, password);
-  if(res){
-    navigate("/dashboard")
-  }
+    const res = await login(email, password);
+    console.log('REs', res);
+    if (res) {
+      navigate('/dashboard');
+    }
   };
 
   return (

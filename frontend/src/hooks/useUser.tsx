@@ -1,17 +1,17 @@
 import { userService } from '@/services/userService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export function useUser() {
   const queryClient = useQueryClient();
 
-  const userQuery = useQuery({
-    queryKey: ['user'],
-    queryFn: userService.getUser,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-    retry: 2,
-  });
+  // const userQuery = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: userService.getUser,
+  //   staleTime: 5 * 60 * 1000, // 5 minutes
+  //   gcTime: 10 * 60 * 1000, // 10 minutes
+  //   retry: 2,
+  // });
 
   // Mutation to update user
   const updateUserMutation = useMutation({
@@ -35,10 +35,10 @@ export function useUser() {
   });
 
   return {
-    user: userQuery.data,
-    isLoading: userQuery.isLoading,
-    error: userQuery.error,
-    isError: userQuery.isError,
+    // userQuery: userQuery,
+    // isLoading: userQuery.isLoading,
+    // error: userQuery.error,
+    // isError: userQuery.isError,
 
     updateUser: updateUserMutation.mutate,
     isUpdating: updateUserMutation.isPending,

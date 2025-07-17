@@ -1,17 +1,15 @@
-import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
-
+  console.log('token', token);
   useEffect(() => {
-    if (user) {
+    if (token != null) {
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+  }, [token]);
 
   return children;
 };

@@ -9,6 +9,7 @@ import { useDashboard } from '@/hooks/useDashboard';
 import type { Course } from '@/types';
 import { calculateProgress, canCompleteModule } from '@/utils/courseUtils';
 import { BookOpen, CheckCircle, Circle, Lock, Star } from 'lucide-react';
+import { useState } from 'react';
 
 interface CourseDetailModalProps {
   course: Course;
@@ -18,12 +19,16 @@ interface CourseDetailModalProps {
 
 export function CourseDetailModal({ course, open, onOpenChange }: CourseDetailModalProps) {
   const { updateModule, isUpdatingModule } = useDashboard();
+  const [updatingModuleId, setUpdatingModuleId] = useState<string | null>(null);
 
-  const handleModuleToggle = (moduleId: string, completed: boolean) => {
-    if (!canCompleteModule(course.modules, moduleId) && completed) {
-      return; 
+  const handleModuleToggle = async (moduleId: string, completed: boolean) => {
+    if (!canCompleteModule(course.modules, moduleId) && completed) return;
+    setUpdatingModuleId(moduleId);
+    try {
+      await updateModule({ courseId: course.id, moduleId, completed });
+    } finally {
+      setUpdatingModuleId(null);
     }
-    updateModule({ courseId: course.id, moduleId, completed });
   };
 
   const actualProgress = calculateProgress(course.modules);
@@ -39,45 +44,47 @@ export function CourseDetailModal({ course, open, onOpenChange }: CourseDetailMo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white to-slate-50">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl text-slate-800">
-            <BookOpen className="h-6 w-6 text-teal-600" />
-            {course.title}
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white to-slate-50 mx-4 sm:mx-0">
+        <DialogHeader className="px-2 sm:px-6">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl text-slate-800">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 flex-shrink-0" />
+            <span className="truncate">{course.title}</span>
           </DialogTitle>
-          <DialogDescription className="text-slate-600">📚 Complete modules in sequence to track your progress</DialogDescription>
+          <DialogDescription className="text-slate-600 text-sm">📚 Complete modules in sequence to track your progress</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 px-2 sm:px-6">
           {/* Progress Overview */}
-          <div className="bg-gradient-to-r from-teal-50 to-slate-50 p-4 rounded-xl border border-teal-200">
-            <div className="flex justify-between items-center mb-3">
-              <span className="font-semibold text-slate-800">🎯 Overall Progress</span>
-              <span className="text-sm text-slate-600 bg-white px-3 py-1 rounded-full">
+          <div className="bg-gradient-to-r from-teal-50 to-slate-50 p-3 sm:p-4 rounded-xl border border-teal-200">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
+              <span className="font-semibold text-slate-800 text-sm sm:text-base">🎯 Overall Progress</span>
+              <span className="text-xs sm:text-sm text-slate-600 bg-white px-2 sm:px-3 py-1 rounded-full self-start">
                 {completedModules} of {course.modules.length} modules completed
               </span>
             </div>
             <div className="relative">
-              <Progress value={actualProgress} className="h-4 bg-slate-200" />
+              <Progress value={actualProgress} className="h-3 sm:h-4 bg-slate-200" />
               <div
-                className={`absolute top-0 left-0 h-4 rounded-full bg-gradient-to-r ${getProgressColor(actualProgress)} transition-all duration-500`}
+                className={`absolute top-0 left-0 h-3 sm:h-4 rounded-full bg-gradient-to-r ${getProgressColor(
+                  actualProgress
+                )} transition-all duration-500`}
                 style={{ width: `${actualProgress}%` }}
               />
             </div>
-            <p className="text-sm text-slate-700 mt-2 font-medium">{actualProgress}% Complete</p>
+            <p className="text-xs sm:text-sm text-slate-700 mt-2 font-medium">{actualProgress}% Complete</p>
           </div>
 
           {/* Skills */}
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-200">
-            <h4 className="font-semibold mb-3 text-slate-800 flex items-center gap-2">
-              <Star className="h-4 w-4 text-amber-500" />
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-3 sm:p-4 rounded-xl border border-emerald-200">
+            <h4 className="font-semibold mb-3 text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+              <Star className="h-4 w-4 text-amber-500 flex-shrink-0" />
               Skills You'll Master
             </h4>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {course.skills.map((skill, index) => (
                 <Badge
                   key={skill}
-                  className={`transition-all hover:scale-105 ${
+                  className={`transition-all hover:scale-105 text-xs ${
                     index % 3 === 0
                       ? 'bg-gradient-to-r from-slate-500 to-slate-600 text-white'
                       : index % 3 === 1
@@ -93,29 +100,39 @@ export function CourseDetailModal({ course, open, onOpenChange }: CourseDetailMo
 
           {/* Modules */}
           <div>
-            <h4 className="font-semibold mb-4 text-slate-800 flex items-center gap-2">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-slate-800 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm sm:text-base">
               📋 Course Modules
-              <span className="text-sm text-slate-500">(Complete in Order)</span>
+              <span className="text-xs sm:text-sm text-slate-500">(Complete in Order)</span>
             </h4>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {sortedModules.map((module, index) => {
                 const canComplete = canCompleteModule(course.modules, module.id);
                 const isLocked = !canComplete && !module.completed;
+                const isUpdating = updatingModuleId === module.id;
 
                 return (
                   <div
                     key={module.id}
-                    className={`flex items-start space-x-3 p-4 rounded-xl border transition-all duration-300 ${
-                      module.completed
-                        ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 shadow-sm'
-                        : isLocked
-                        ? 'bg-gradient-to-r from-slate-50 to-gray-100 border-slate-200 opacity-60'
-                        : 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200 hover:shadow-md'
-                    }`}
+                    className={`relative flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-xl border transition-all duration-300 group
+                      ${
+                        module.completed
+                          ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 shadow-sm'
+                          : isLocked
+                          ? 'bg-gradient-to-r from-slate-50 to-gray-100 border-slate-200 opacity-60'
+                          : 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200 hover:shadow-md'
+                      }
+                      ${isUpdating ? 'opacity-50 pointer-events-none' : ''}
+                    `}
                   >
-                    <div className="flex items-center space-x-3 mt-1">
+                    {isUpdating && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl z-10">
+                        <div className="h-5 w-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+
+                    <div className="flex items-center space-x-2 sm:space-x-3 mt-1 flex-shrink-0 z-0">
                       <span
-                        className={`text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center ${
+                        className={`text-xs font-bold w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center ${
                           module.completed ? 'bg-emerald-500 text-white' : isLocked ? 'bg-slate-400 text-white' : 'bg-teal-500 text-white'
                         }`}
                       >
@@ -124,30 +141,35 @@ export function CourseDetailModal({ course, open, onOpenChange }: CourseDetailMo
                       <Checkbox
                         id={module.id}
                         checked={module.completed}
-                        disabled={isLocked || isUpdatingModule}
+                        disabled={isLocked || isUpdating || isUpdatingModule}
                         onCheckedChange={(checked) => handleModuleToggle(module.id, checked as boolean)}
                         className="data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                       />
                       {module.completed ? (
-                        <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                       ) : isLocked ? (
-                        <Lock className="h-5 w-5 text-slate-400" />
+                        <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                       ) : (
-                        <Circle className="h-5 w-5 text-teal-400" />
+                        <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-teal-400" />
                       )}
                     </div>
-                    <div className="flex-1">
+
+                    <div className="flex-1 min-w-0 z-0">
                       <Label
                         htmlFor={module.id}
-                        className={`cursor-pointer font-semibold text-base ${
+                        className={`cursor-pointer font-semibold text-sm sm:text-base ${
                           module.completed ? 'text-emerald-800' : isLocked ? 'text-slate-500' : 'text-slate-800'
                         }`}
                       >
-                        {module.title}
-                        {isLocked && <span className="text-xs ml-2 text-rose-500">🔒 Complete previous modules first</span>}
+                        <span className="block sm:inline">{module.title}</span>
+                        {isLocked && <span className="text-xs ml-0 sm:ml-2 text-rose-500 block sm:inline">🔒 Complete previous modules first</span>}
                       </Label>
                       {module.description && (
-                        <p className={`text-sm mt-1 ${module.completed ? 'text-emerald-700' : isLocked ? 'text-slate-400' : 'text-slate-600'}`}>
+                        <p
+                          className={`text-xs sm:text-sm mt-1 ${
+                            module.completed ? 'text-emerald-700' : isLocked ? 'text-slate-400' : 'text-slate-600'
+                          }`}
+                        >
                           {module.description}
                         </p>
                       )}
@@ -160,10 +182,10 @@ export function CourseDetailModal({ course, open, onOpenChange }: CourseDetailMo
 
           {/* Embed Status */}
           {course.embedded && (
-            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 p-4 rounded-xl">
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 p-3 sm:p-4 rounded-xl">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-teal-600" />
-                <span className="text-sm font-semibold text-teal-800">✨ This course is embedded in your resume</span>
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-teal-600 flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-semibold text-teal-800">✨ This course is embedded in your resume</span>
               </div>
             </div>
           )}

@@ -68,7 +68,7 @@ export function useDashboard() {
   const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
     queryFn: userService.getDashboardData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 1 * 60 * 1000, // 1 minutes
   });
 
   const updateModuleMutation = useMutation({
@@ -137,6 +137,9 @@ export function useDashboard() {
       }
 
       toast.error(' Error', { description: 'Failed to update module progress. Please try again.' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 
