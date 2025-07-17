@@ -1,6 +1,6 @@
+import { Course, Resume, User } from '@/models';
+import { DashboardData } from '@/types';
 import { Request, Response } from 'express';
-import { Course, Resume, User } from '../models';
-import { DashboardData } from '../types';
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.userId);

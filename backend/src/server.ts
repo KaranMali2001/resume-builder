@@ -1,5 +1,5 @@
-import { app } from './app';
-import { ConnectToDB } from './config/database';
+import { app } from '@/app';
+import { ConnectToDB } from '@/config/database';
 
 const PORT = 3000;
 

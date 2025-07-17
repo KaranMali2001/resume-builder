@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 import { Course, User } from '@/models';
+import Resume from '@/models/Resume';
 import { getAchievements } from '@/utils/getAchievements';
-import Resume from '../models/Resume';
 
 export const updateProgress = async (req: Request, res: Response) => {
   try {

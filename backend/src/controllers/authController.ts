@@ -1,8 +1,8 @@
 import { JWT_SECRET } from '@/config/constants';
 import { Resume } from '@/models';
+import { User } from '@/models/User';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
 
 export const register = async (req: Request, res: Response) => {
   try {

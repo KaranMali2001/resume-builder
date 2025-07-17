@@ -1,4 +1,4 @@
-import { Course } from './Course';
-import Resume from './Resume';
-import { User } from './User';
+import { Course } from '@/models/Course';
+import Resume from '@/models/Resume';
+import { User } from '@/models/User';
 export { Course, Resume, User };
