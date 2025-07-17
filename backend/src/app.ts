@@ -9,11 +9,17 @@ import morgan from 'morgan';
 dotenv.config();
 
 export const app = express();
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : ':method :url :status :response-time ms - :res[content-length]'));
+app.use(
+  morgan(
+    process.env.NODE_ENV === 'production'
+      ? 'combined'
+      : ':method :url :status :response-time ms - :res[content-length]',
+  ),
+);
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   }),
 );
